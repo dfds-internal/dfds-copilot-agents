@@ -210,7 +210,7 @@ Keep your agent definitions in Git:
 
 - [GitHub Copilot Documentation](https://docs.github.com/en/copilot)
 - [DFDS Engineering Standards](https://github.com/dfds-internal) *(internal)*
-- [Agent Examples](https://github.com/dfds-internal/dfds-copilot-agents/tree/main/agents))
+- [Agent Examples](https://github.com/dfds-internal/dfds-copilot-agents/tree/main/agents)
 
 ## Support
 
