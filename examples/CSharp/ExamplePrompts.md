@@ -214,7 +214,14 @@ If you ask for something that violates standards, the agent will suggest the sec
 
 ## Next Steps
 
-1. **Copy the agent file** to your project's `.github/agents/` folder
+1. **Copy the agent files** to your project's `.github/agents/` folder:
+   ```bash
+   # Copy base agent (required)
+   cp path/to/dfds-copilot-agents/agents/DFDS.agent.md .github/agents/
+   
+   # Copy C# expert agent (automatically extends base agent)
+   cp path/to/dfds-copilot-agents/agents/CSharpExpert.DFDS.agent.md .github/agents/
+   ```
 2. **Try these prompts** in your IDE with GitHub Copilot enabled
 3. **Customize prompts** based on your specific project needs
 4. **Share feedback** to help improve the agent definitions
