@@ -27,18 +27,9 @@ GitHub Copilot Agents are custom AI assistants that understand your specific tec
 
 In your project repository, create a `.github/agents` directory:
 
-```bash
-mkdir -p .github/agents
-```
-
 ### 2. Copy relevant agent definitions
 
 Copy the agent definitions you need from this repository's `/agents` folder to your project's `.github/agents` folder:
-
-```bash
-# Example: Adding the C# expert to your project
-cp agents/CSharpExpert.DFDS.agent.md your-project/.github/agents/
-```
 
 ### 3. Use the agent in GitHub Copilot
 
