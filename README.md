@@ -78,7 +78,7 @@ All agent definitions in this repository are built around DFDS engineering princ
 
 | Agent | Technology | Purpose |
 |-------|-----------|---------|
-| [CSharpExpert.DFDS.agent.md](./agents/CSharpExpert.DFDS.agent.md) | C#/.NET | Backend APIs, microservices, Azure Functions |
+| [CSharpExpert.DFDS.agent.md](./agents/CSharpExpert.DFDS.agent.md) | C#/.NET | Backend APIs, microservices |
 | [NextJsExpert.DFDS.agent.md](./agents/NextJsExpert.DFDS.agent.md) | Next.js/React | Frontend applications, SSR, API routes |
 | [PythonExpert.DFDS.agent.md](./agents/PythonExpert.DFDS.agent.md) | Python | Data pipelines, automation, cloud infrastructure |
 
