@@ -18,7 +18,6 @@ This library is designed for DFDS engineers working across our technology ecosys
 - **Backend Engineers**: Building APIs and services with C#/.NET
 - **Frontend Engineers**: Creating modern web applications with Next.js and React
 - **Python Engineers**: Developing data pipelines, automation, and cloud infrastructure
-- **Cloud Engineers**: All teams building cloud-native solutions on AWS/Azure
 
 ## How to Use Copilot Agents
 
@@ -58,11 +57,6 @@ All agent definitions in this repository are built around DFDS engineering princ
 - Security is not optional—it's built in from the start
 - Secrets management, input validation, and least privilege access
 - OWASP Top 10 awareness in all code generation
-
-### ☁️ Cloud-Native Architecture
-- Design for AWS/Azure from day one
-- Containerization, orchestration, and serverless patterns
-- Observability, resilience, and cost optimization
 
 ### 🏭 Production-Ready Mindset
 - Code must be maintainable, testable, and observable
