@@ -31,6 +31,26 @@ In your project repository, create a `.github/agents` directory:
 
 Copy the agent definitions you need from this repository's `/agents` folder to your project's `.github/agents` folder:
 
+**For all projects**, start with the base agent:
+```bash
+# Base DFDS standards (recommended for all projects)
+cp path/to/dfds-copilot-agents/agents/DFDS.agent.md .github/agents/
+```
+
+Then add language-specific agents as needed:
+```bash
+# For C#/.NET projects
+cp path/to/dfds-copilot-agents/agents/CSharpExpert.DFDS.agent.md .github/agents/
+
+# For Next.js/React projects
+cp path/to/dfds-copilot-agents/agents/NextJsExpert.DFDS.agent.md .github/agents/
+
+# For Python projects
+cp path/to/dfds-copilot-agents/agents/PythonExpert.DFDS.agent.md .github/agents/
+```
+
+**Note**: Language-specific agents automatically extend the base DFDS agent using the `@DFDS.agent.md` reference, so you get both company-wide and technology-specific standards.
+
 ### 3. Use the agent in GitHub Copilot
 
 Once configured, you can invoke the agent in:
@@ -66,6 +86,14 @@ All agent definitions in this repository are built around DFDS engineering princ
 - Keep dependencies up-to-date and minimal
 
 ## Available Agents
+
+### Base Agent
+| Agent | Purpose |
+|-------|---------|
+| [DFDS.agent.md](./agents/DFDS.agent.md) | Base standards for all DFDS engineering (security, logging, testing, cloud-native) |
+
+### Language-Specific Agents
+All language-specific agents extend the base DFDS agent and add technology-specific best practices.
 
 | Agent | Technology | Purpose |
 |-------|-----------|---------|

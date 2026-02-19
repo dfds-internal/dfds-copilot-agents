@@ -39,12 +39,15 @@ Copy the relevant agent definition files from this repository:
 
 ```bash
 # For C#/.NET projects
+cp path/to/dfds-copilot-agents/agents/DFDS.agent.md .github/agents/
 cp path/to/dfds-copilot-agents/agents/CSharpExpert.DFDS.agent.md .github/agents/
 
 # For Next.js/React projects
+cp path/to/dfds-copilot-agents/agents/DFDS.agent.md .github/agents/
 cp path/to/dfds-copilot-agents/agents/NextJsExpert.DFDS.agent.md .github/agents/
 
 # For Python projects
+cp path/to/dfds-copilot-agents/agents/DFDS.agent.md .github/agents/
 cp path/to/dfds-copilot-agents/agents/PythonExpert.DFDS.agent.md .github/agents/
 ```
 
@@ -178,8 +181,32 @@ You can have multiple agents in your project. Copilot will use the most relevant
 ### Agent Hierarchies
 
 Agents can reference other agents or build upon them:
-- Create a base `DFDS.agent.md` with company-wide standards
-- Create specific agents that extend the base (e.g., `CSharpExpert.DFDS.agent.md`)
+- **Base agent**: `DFDS.agent.md` contains company-wide standards (security, logging, testing, production mindset, cloud-native principles)
+- **Language-specific agents**: Extend the base agent using `@DFDS.agent.md` reference and add framework/syntax/performance specifics
+
+This hierarchy ensures consistent standards across all DFDS projects while allowing technology-specific optimizations.
+
+**Example**: The C# Expert agent includes `@DFDS.agent.md` at the top, inheriting all base standards, then adds C#-specific patterns like:
+- ILogger and structured logging with ASP.NET Core
+- Polly for resilience patterns
+- xUnit and Moq for testing
+- Entity Framework best practices
+
+### Setting Up Agent Hierarchies in Your Project
+
+When using DFDS agents in your project:
+
+1. **Always include the base agent** (`DFDS.agent.md`) for company-wide standards
+2. **Add language-specific agents** that automatically extend the base agent
+3. **Optionally create team-specific agents** that further extend language agents
+
+```bash
+# Example: .github/agents/ structure
+.github/agents/
+├── DFDS.agent.md                    # Base standards (required)
+├── CSharpExpert.DFDS.agent.md       # Extends base with C# specifics
+└── PaymentTeam.CSharp.agent.md      # Optional: Your team's additional patterns
+```
 
 ### Version Control
 
