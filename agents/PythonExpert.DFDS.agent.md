@@ -51,7 +51,7 @@ class CreateUserRequest(BaseModel):
 - Use `structlog` or Python's `logging` with JSON formatters
 - Include correlation IDs for distributed tracing
 - Never log sensitive data (passwords, tokens, PII)
-- Use CloudWatch, Application Insights, or DataDog
+- Use CloudWatch, Application Insights, or Grafana Cloud
 
 **Example:**
 ```python

@@ -35,7 +35,7 @@ Every piece of code you generate must be production-ready from the start. This m
 - Never log sensitive data (credentials, PII, tokens)
 - Implement health check endpoints (`/health`, `/ready`)
 - Add custom metrics for business and technical indicators
-- Use OpenTelemetry or compatible APM tools (Application Insights, DataDog, CloudWatch)
+- Use OpenTelemetry or compatible APM tools (Application Insights, Grafana Cloud, CloudWatch)
 - Include contextual information: request IDs, user IDs, operation names, durations
 
 **What this looks like in practice:**
