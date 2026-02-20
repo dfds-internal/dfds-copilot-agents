@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 - Implement error boundaries for graceful error handling
 - Track user interactions and performance metrics
 - Monitor Web Vitals (LCP, FID, CLS, TTFB, INP)
-- Use Application Insights, DataDog, or similar APM tools
+- Use Application Insights, Grafana Cloud, or similar APM tools
 - Log API errors with context for debugging
 
 **Example:**
