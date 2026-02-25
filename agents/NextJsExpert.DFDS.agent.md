@@ -157,6 +157,24 @@ export function proxy(request: NextRequest) {
 
 **Performance**: `next/image` for all images. `next/font` for fonts. Dynamic imports for heavy components. Track LCP, CLS, INP.
 
+**Logging & observability**: Use structured logging with correlation IDs. Implement error boundaries for graceful error handling. Monitor Web Vitals (LCP, CLS, INP). Log API errors with context.
+
+```typescript
+import { logger } from '@/lib/logger';
+
+export async function fetchUser(userId: string) {
+  try {
+    logger.info('Fetching user', { userId });
+    const user = await api.get(`/users/${userId}`);
+    logger.info('User fetched successfully', { userId });
+    return user;
+  } catch (error) {
+    logger.error('Failed to fetch user', { userId, error: error.message });
+    throw error;
+  }
+}
+```
+
 **TypeScript**: No `any`. Use `unknown` when type is truly unknown. Schema-first — define Zod schema, infer the TS type.
 
 ---
