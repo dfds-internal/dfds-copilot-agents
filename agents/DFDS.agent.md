@@ -18,6 +18,7 @@ Every piece of code you generate must be production-ready from the start. This m
 - Never expose sensitive data in logs, error messages, or API responses
 - Use secure communication channels (HTTPS, TLS)
 - Implement rate limiting and throttling for public-facing services
+- Log all security events comprehensively (authentication, authorization, account changes, suspicious activity) while ensuring sensitive data (passwords, tokens, PII) is never included in logs
 
 **What this looks like in practice:**
 - Configuration comes from environment variables or secure vaults, never committed in code
@@ -37,6 +38,10 @@ Every piece of code you generate must be production-ready from the start. This m
 - Add custom metrics for business and technical indicators
 - Use OpenTelemetry or compatible APM tools (Application Insights, Grafana Cloud, CloudWatch)
 - Include contextual information: request IDs, user IDs, operation names, durations
+- Log all successful and unsuccessful authentication attempts (logins, failed logins, password resets)
+- Log all successful and unsuccessful authorization attempts (resource access, action attempts, data changes)
+- Log all changes to user accounts and permissions (create, modify, delete accounts, role/permission changes)
+- Log all suspicious activity (multiple failed attempts, unusual access patterns, unauthorized configuration changes)
 
 **What this looks like in practice:**
 - Every service logs structured JSON with consistent field names
@@ -44,6 +49,46 @@ Every piece of code you generate must be production-ready from the start. This m
 - You can trace a user's journey across services using correlation IDs
 - Health checks report dependency status, not just "healthy"
 - Dashboards show both technical metrics (latency, errors) and business metrics (orders, users)
+
+### Security Event Logging
+
+Security event logging is mandatory. Logs are the primary mechanism for detecting, investigating, and responding to security incidents.
+
+**Critical events to log:**
+- User login and logout events
+- Failed login attempts
+- Password reset events
+- Account creation and deletion events
+- Permission changes
+- Access to sensitive data
+- Changes to system configuration
+- Suspicious activity:
+  - Failed login attempts from multiple locations
+  - Attempts to access sensitive resources without authorization
+  - Changes to system configuration without authorization
+
+**Required fields for every security event:**
+- **User identity**: Username or unique identifier of the user
+- **System identity**: IP address, hostname, or unique identifier of the originating system
+- **Target resource**: The specific resource being accessed or modified
+- **Action**: The specific action being performed
+- **Outcome**: Success or failure status
+- **Timestamp**: When the event occurred
+- **Correlation ID**: For distributed tracing
+
+**Why this matters:**
+- Detect and investigate security incidents
+- Troubleshoot authentication and authorization problems
+- Comply with regulatory requirements (GDPR, industry-specific regulations)
+- Identify patterns that indicate security breaches
+
+**What this looks like in practice:**
+- Every login attempt is logged with user, IP, timestamp, and outcome
+- Failed authentication attempts trigger alerts after a configurable threshold
+- Permission changes are logged with both the granter and grantee
+- Logs can reconstruct the full timeline of a security incident
+- SIEM systems can correlate events across services
+- Audit trails are tamper-evident and retained per compliance requirements
 
 ## Testing Discipline
 
