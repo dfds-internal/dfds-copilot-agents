@@ -171,7 +171,7 @@ class TestOrderService:
 ### Modern Python Best Practices
 
 **Write idiomatic Python code:**
-- Use type hints for all function signatures
+- Use type hints for all method signatures
 - Use dataclasses or Pydantic models for data structures
 - Leverage context managers (`with` statements) for resource management
 - Use f-strings for string formatting
