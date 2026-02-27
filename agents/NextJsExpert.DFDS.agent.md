@@ -17,6 +17,109 @@ You are a senior Next.js engineer building production-grade web applications. Yo
 
 ---
 
+## DFDS Design System
+
+When building DFDS-branded UIs, use the Navigator component library and Compass UI for the header. Read `.skills/dfds-navigator-ui/SKILL.md` for full setup. Auth for the packages: `.skills/dfds-npmrc-setup/SKILL.md`. For the complete shadcn/ui DFDS theme (CSS variables, Tailwind v4 bridge, form overrides): `.skills/dfds-shadcn-theme/SKILL.md`.
+
+### Packages
+
+```bash
+pnpm add @dfds-frontend/compass-ui \
+         @dfds-frontend/navigator-components \
+         @dfds-frontend/navigator-icons \
+         @dfds-frontend/navigator-styles
+```
+
+> Packages are on GitHub Packages — require `.npmrc` with a `read:packages` PAT. See `dfds-npmrc-setup` skill.
+
+### DFDS Header
+
+Import `NavigationMenu` from `@dfds-frontend/compass-ui`. Use `usePathname` to resolve the active tab:
+
+```tsx
+"use client";
+import { usePathname } from "next/navigation";
+import type { NavigationMenuProps } from "@dfds-frontend/compass-ui";
+import { NavigationMenu } from "@dfds-frontend/compass-ui";
+
+type TabKey = "HOME" | "ABOUT";
+
+const TABS: NavigationMenuProps<TabKey, never>["menuConfig"] = {
+  HOME: { label: "Home", link: "/", megaMenu: [], asideMenu: [] },
+  ABOUT: { label: "About", link: "/about", megaMenu: [], asideMenu: [] },
+};
+
+export default function Header() {
+  const pathname = usePathname();
+  const activeTab =
+    (Object.keys(TABS) as TabKey[]).find(
+      (k) => k !== "HOME" && pathname.startsWith(TABS[k].link)
+    ) ?? "HOME";
+
+  return (
+    <NavigationMenu
+      logoType="regular"
+      logoHref="/"
+      defaultActiveTab={activeTab}
+      menuConfig={TABS}
+      actionDispatch={{}}
+    />
+  );
+}
+```
+
+Render `<Header />` in `app/layout.tsx` (outside any Suspense boundary).
+
+### Tailwind v4 — required CSS setup
+
+In `globals.css`, add **in this order**, then the `@source` directives so Tailwind v4 emits Navigator icon size classes:
+
+```css
+@import "tailwindcss";
+@import "@dfds-frontend/navigator-styles/tailwind/v4";
+@import "@dfds-frontend/navigator-styles/fonts";
+@import "@dfds-frontend/navigator-components/styles";
+
+@source "../../node_modules/@dfds-frontend/navigator-components/src";
+@source "../../node_modules/@dfds-frontend/navigator-icons/dist";
+@source "../../node_modules/@dfds-frontend/compass-ui";
+
+@layer base {
+  svg { display: inline; } /* prevents Tailwind preflight breaking icon layout */
+}
+```
+
+### shadcn/ui — Navigator theme
+
+shadcn components are unstyled by default. Wire them to DFDS tokens by adding these CSS variables (sharp corners, DFDS blue primary, navy foreground):
+
+```css
+:root {
+  --radius: 0rem;
+  --background: rgb(255 255 255);
+  --foreground: rgb(0 43 69);
+  --primary: rgb(26 99 245);
+  --primary-foreground: rgb(255 255 255);
+  --secondary: rgb(229 244 255);
+  --secondary-foreground: rgb(0 43 69);
+  --muted: rgb(227 234 237);
+  --muted-foreground: rgb(77 94 107);
+  --border: rgb(199 209 214);
+  --input: rgb(199 209 214);
+  --ring: rgb(75 170 255);
+  --destructive: rgb(225 37 25);
+  --destructive-foreground: rgb(255 255 255);
+  --accent: rgb(235 255 100);
+  --accent-foreground: rgb(0 43 69);
+}
+```
+
+Ensure `components.json` has `"cssVariables": true` — never change this to `false`.
+
+For the full dark-mode token map and all snippets see `.skills/dfds-navigator-ui/references/nextjs-snippets.md`.
+
+---
+
 ## Architecture: Pick the Right Data Strategy
 
 ### No external BFF → Server-first
