@@ -45,6 +45,9 @@ cp path/to/dfds-copilot-agents/agents/CSharpExpert.DFDS.agent.md .github/agents/
 # For Next.js/React projects
 cp path/to/dfds-copilot-agents/agents/NextJsExpert.DFDS.agent.md .github/agents/
 
+# For TanStack Start projects (full-stack React + SQLite)
+cp path/to/dfds-copilot-agents/agents/TanStackExpert.DFDS.agent.md .github/agents/
+
 # For Python projects
 cp path/to/dfds-copilot-agents/agents/PythonExpert.DFDS.agent.md .github/agents/
 ```
@@ -98,8 +101,21 @@ All language-specific agents extend the base DFDS agent and add technology-speci
 | Agent | Technology | Purpose |
 |-------|-----------|---------|
 | [CSharpExpert.DFDS.agent.md](./agents/CSharpExpert.DFDS.agent.md) | C#/.NET | Backend APIs, microservices |
-| [NextJsExpert.DFDS.agent.md](./agents/NextJsExpert.DFDS.agent.md) | Next.js/React | Frontend applications, SSR, API routes |
+| [NextJsExpert.DFDS.agent.md](./agents/NextJsExpert.DFDS.agent.md) | Next.js/React | Frontend applications, SSR, API routes — includes DFDS Navigator/shadcn setup |
+| [TanStackExpert.DFDS.agent.md](./agents/TanStackExpert.DFDS.agent.md) | TanStack Start | Full-stack React + SQLite, DFDS design system, hackathons |
 | [PythonExpert.DFDS.agent.md](./agents/PythonExpert.DFDS.agent.md) | Python | Data pipelines, automation, cloud infrastructure |
+
+## Skills
+
+Skills are domain-specific knowledge files that agents load on demand. They cover topics that apply across multiple agents — avoiding duplication in each agent definition.
+
+| Skill | When to use |
+|---|---|
+| [dfds-navigator-ui](./skills/dfds-navigator-ui/SKILL.md) | Add the DFDS header, Navigator tokens, and shadcn/ui with DFDS colours to any React project |
+| [dfds-shadcn-theme](./skills/dfds-shadcn-theme/SKILL.md) | Complete shadcn/ui DFDS theme — CSS variables, Tailwind v4 `@theme inline` bridge, and CVI form overrides |
+| [dfds-npmrc-setup](./skills/dfds-npmrc-setup/SKILL.md) | Authenticate with the `@dfds-frontend` GitHub Packages registry (local, Docker, CI) |
+
+Both the Next.js and TanStack Start agents reference these skills directly.
 
 ## Examples
 
