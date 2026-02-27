@@ -164,6 +164,36 @@ The implementation will:
 
 ---
 
+## Example 6: Consuming and Publishing Kafka Messages with Dafda
+
+### Prompt
+```
+Create a Kafka consumer for an "order-placed" event using Dafda. The handler should:
+- Read Kafka configuration from environment variables
+- Persist the order to a SQL database
+- Publish an "order-confirmed" event back to Kafka using the outbox pattern
+- Include structured logging and error handling
+```
+
+### Expected Output
+The agent will generate:
+- `AddConsumer` registration in `Program.cs` using `WithConfigurationSource` + `WithEnvironmentStyle` for environment-driven configuration (preferred) and `WithBootstrapServers`/`WithGroupId` for local development
+- An `IMessageHandler<OrderPlaced>` implementation with injected dependencies
+- `AddOutbox` and `AddProducer` registration for reliable outbound publishing
+- An `IOutbox`-based publish call inside the service layer
+- Structured logging using `ILogger<T>` at key handler steps
+- Idempotent handler logic (safe to re-process duplicate deliveries)
+
+The code will follow DFDS Dafda standards including:
+- Dafda consumer/producer registration via DI extension methods
+- Environment variable configuration via `WithConfigurationSource` + `WithEnvironmentStyle`
+- Outbox pattern for at-least-once, durable message publishing
+- No direct use of the raw `Confluent.Kafka` client
+- Message handler registered and resolved through the DI container
+- Messages serialized in Dafda's JSON envelope format (`messageId`, `type`, `data`)
+
+---
+
 ## Tips for Using the Agent Effectively
 
 ### Be Specific About Requirements
