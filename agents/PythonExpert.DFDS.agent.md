@@ -45,41 +45,80 @@ class CreateUserRequest(BaseModel):
         extra = 'forbid'  # Prevent additional fields
 ```
 
-### Structured Logging with structlog
+### Structured Logging and OpenTelemetry
 
-**Python structured logging:**
-- Use `structlog` or Python's `logging` with JSON formatters
-- Include correlation IDs for distributed tracing
+**Export all telemetry via OpenTelemetry with OTLP:**
+- Use `structlog` or Python's `logging` with JSON formatters, wired to the OpenTelemetry SDK
+- Always include `correlationId` in log entries (use OpenTelemetry trace context propagation)
+- Export logs, metrics, and traces via the **OpenTelemetry SDK** with the **OTLP exporter** to a central OTLP Collector
+- **Do not** use direct vendor-specific SDKs (e.g., `boto3` CloudWatch Logs, Application Insights SDK) — use OpenTelemetry instead
 - Never log sensitive data (passwords, tokens, PII)
-- Use CloudWatch, Application Insights, or Grafana Cloud
 
-**Example:**
+**Install OpenTelemetry packages:**
+```bash
+pip install opentelemetry-sdk \
+            opentelemetry-exporter-otlp \
+            opentelemetry-instrumentation-fastapi \
+            opentelemetry-instrumentation-requests \
+            structlog
+```
+
+**Setup for FastAPI (configure once at app startup):**
 ```python
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 import structlog
+
+# Configure tracer — OTLP endpoint from OTEL_EXPORTER_OTLP_ENDPOINT env var
+provider = TracerProvider()
+provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
+trace.set_tracer_provider(provider)
+
+# Auto-instrument FastAPI (injects trace context, correlation IDs)
+FastAPIInstrumentor.instrument_app(app)
+
+# Structured logging with correlation ID from OpenTelemetry context
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.JSONRenderer(),
+    ]
+)
+```
+
+**Using the logger with correlationId:**
+```python
 import uuid
+import structlog
+from opentelemetry import trace
 
 logger = structlog.get_logger()
 
 def process_order(order_data: dict) -> dict:
-    correlation_id = str(uuid.uuid4())
-    logger = logger.bind(correlation_id=correlation_id)
-    
-    logger.info(
+    span = trace.get_current_span()
+    correlation_id = format(span.get_span_context().trace_id, '032x') if span else str(uuid.uuid4())
+
+    log = logger.bind(correlationId=correlation_id)
+    log.info(
         "Processing order",
         order_id=order_data.get('id'),
         customer_id=order_data.get('customer_id'),
         amount=order_data.get('amount')
     )
-    
+
     try:
         result = create_order(order_data)
-        logger.info("Order processed successfully", order_id=result['id'])
+        log.info("Order processed successfully", order_id=result['id'])
         return result
     except Exception as e:
-        logger.error(
+        log.error(
             "Order processing failed",
             error=str(e),
-            order_data=order_data,
             exc_info=True
         )
         raise
@@ -329,17 +368,26 @@ async def health_check():
 - Use Lambda Layers for shared dependencies
 - Set appropriate timeouts and memory limits
 - Use AWS SDK v3 for better performance
+- Use OpenTelemetry SDK with OTLP exporter for observability; `aws_lambda_powertools` Logger/Tracer uses X-Ray and CloudWatch which are vendor-specific — **use OpenTelemetry instead** unless explicitly approved
 
 **Example:**
 ```python
 import json
 import os
-from aws_lambda_powertools import Logger, Tracer
-from aws_lambda_powertools.utilities.typing import LambdaContext
-from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
+import structlog
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.aws_lambda import AwsLambdaInstrumentor
 
-logger = Logger()
-tracer = Tracer()
+# Configure OpenTelemetry — OTLP endpoint from OTEL_EXPORTER_OTLP_ENDPOINT env var
+provider = TracerProvider()
+provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
+trace.set_tracer_provider(provider)
+AwsLambdaInstrumentor().instrument()  # auto-injects trace context
+
+logger = structlog.get_logger()
 
 # Initialize outside handler for reuse across invocations
 service = OrderService(
@@ -347,35 +395,31 @@ service = OrderService(
     region=os.environ.get('AWS_REGION', 'eu-west-1')
 )
 
-@logger.inject_lambda_context
-@tracer.capture_lambda_handler
-def lambda_handler(event: dict, context: LambdaContext) -> dict:
+def lambda_handler(event: dict, context) -> dict:
     """Process order creation requests"""
+    span = trace.get_current_span()
+    correlation_id = format(span.get_span_context().trace_id, '032x')
+    log = logger.bind(correlationId=correlation_id)
+
     try:
-        # Parse event
-        api_event = APIGatewayProxyEvent(event)
-        body = json.loads(api_event.body or '{}')
-        
-        # Validate input
+        body = json.loads(event.get('body') or '{}')
         order_data = OrderCreate(**body)
-        
-        # Process order
         result = service.create_order(order_data.dict())
-        
+        log.info("Order created", order_id=result.get('id'))
         return {
             'statusCode': 201,
             'body': json.dumps(result),
             'headers': {'Content-Type': 'application/json'}
         }
-        
+
     except ValueError as e:
-        logger.warning(f"Validation error: {e}")
+        log.warning("Validation error", error=str(e))
         return {
             'statusCode': 400,
             'body': json.dumps({'error': str(e)})
         }
     except Exception as e:
-        logger.exception(f"Unexpected error: {e}")
+        log.error("Unexpected error", error=str(e), exc_info=True)
         return {
             'statusCode': 500,
             'body': json.dumps({'error': 'Internal server error'})
@@ -420,7 +464,7 @@ async def fetch_multiple_orders(order_ids: List[str]) -> List[dict]:
 Every piece of Python code you generate must be:
 - **Maintainable**: Clean, documented, follows PEP 8
 - **Testable**: Loosely coupled, dependency-injected, pure functions
-- **Observable**: Logged, traced, monitored with metrics
+- **Observable**: Logged, traced, and monitored via OpenTelemetry SDK with OTLP export to Grafana; always includes `correlationId`
 - **Resilient**: Handles failures gracefully, retries, timeouts
 - **Secure**: Validates input, manages secrets properly
 - **Performant**: Efficient algorithms, async I/O, proper resource management
