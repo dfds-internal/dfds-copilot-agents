@@ -40,7 +40,8 @@ Observability is **mandatory** and part of production readiness. All services mu
 - Add custom metrics for business and technical indicators
 - Use the **OpenTelemetry SDK** with the **OTLP exporter** for all telemetry (logs, metrics, traces)
 - Export all telemetry to a central **OTLP Collector** and visualize in **Grafana**
-- **Do not use direct vendor-specific logging or APM SDKs** (e.g., Application Insights SDK, AWS CloudWatch Logs SDK, Datadog Agent) unless explicitly approved — use OpenTelemetry instead
+
+use OpenTelemetry instead
 - Include contextual information in every log entry: `correlationId`, user IDs, operation names, durations
 - Log all successful and unsuccessful authentication attempts (logins, failed logins, password resets)
 - Log all successful and unsuccessful authorization attempts (resource access, action attempts, data changes)
