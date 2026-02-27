@@ -77,7 +77,7 @@ Include tests for:
 - Validation failures (invalid amount, missing customer data)
 - Database failure scenarios
 - Business rule violations (customer order limit exceeded)
-Use xUnit, Moq, and FluentAssertions
+Use NUnit, Moq, and FluentAssertions
 ```
 
 ### Expected Output

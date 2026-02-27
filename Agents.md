@@ -82,7 +82,7 @@ You: "Create a new API endpoint for user registration"
 Agent: [Generates code following DFDS patterns with validation, logging, error handling]
 
 You: "Add unit tests for the registration endpoint"
-Agent: [Creates comprehensive tests using xUnit with proper mocking and assertions]
+Agent: [Creates comprehensive tests using NUnit with proper mocking and assertions]
 
 You: "Review this code for security issues"
 Agent: [Analyzes code against OWASP Top 10 and DFDS security standards]
@@ -189,7 +189,7 @@ This hierarchy ensures consistent standards across all DFDS projects while allow
 **Example**: The C# Expert agent includes `@DFDS.agent.md` at the top, inheriting all base standards, then adds C#-specific patterns like:
 - ILogger and structured logging with ASP.NET Core
 - Polly for resilience patterns
-- xUnit and Moq for testing
+- NUnit and Moq for testing
 - Entity Framework best practices
 
 ### Setting Up Agent Hierarchies in Your Project
