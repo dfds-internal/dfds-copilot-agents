@@ -94,21 +94,45 @@ services.AddHttpClient<IExternalService, ExternalService>()
 
 ### Messaging with Dafda (DFDS Kafka Client)
 
-**Use Dafda for all Kafka messaging at DFDS.** Dafda is the DFDS-internal .NET Kafka client and is the required library for producing and consuming Kafka messages in DFDS services. Do not use the raw `Confluent.Kafka` client directly.
+**Use Dafda for all Kafka messaging at DFDS.** Dafda is the DFDS-internal .NET Kafka client built on top of `Confluent.Kafka`. It is the required library for producing and consuming Kafka messages in DFDS services. Do not use the raw `Confluent.Kafka` client directly.
 
+Install via the .NET CLI:
+```bash
+dotnet add package dafda
+```
+
+Key characteristics:
 - Register consumers and producers in `Program.cs` / `Startup.cs` via the provided extension methods
-- Implement `IMessageHandler<TMessage>` for each message type you consume
+- Implement `IMessageHandler<TMessage>` for each message type you consume; consumers run as hosted background services
+- Prefer reading Kafka configuration from environment variables (`WithConfigurationSource` + `WithEnvironmentStyle`) over hardcoded values
 - Use the outbox pattern via `AddOutbox` for reliable message publishing
 - Always specify a meaningful `GroupId` and use descriptive topic/message-type names
 - Message handlers must be idempotent; Kafka delivers at-least-once
+- Messages are wrapped in a JSON envelope with `messageId`, `type`, and `data` fields
 
-**Consumer registration example:**
+**Consumer registration (environment variable configuration – preferred for production):**
 ```csharp
-// Program.cs / Startup.cs
+// Environment variables:
+//   DEFAULT_KAFKA_BOOTSTRAP_SERVERS=kafka.example.com:9092
+//   SAMPLE_KAFKA_GROUP_ID=my-service-consumer-group
+services.AddConsumer(options =>
+{
+    options.WithConfigurationSource(Configuration);
+    options.WithEnvironmentStyle("DEFAULT_KAFKA", "SAMPLE_KAFKA");
+
+    options.RegisterMessageHandler<OrderPlaced, OrderPlacedHandler>("order-events", "order-placed");
+});
+```
+
+**Consumer registration (explicit / local development):**
+```csharp
 services.AddConsumer(options =>
 {
     options.WithBootstrapServers("localhost:9092");
     options.WithGroupId("my-service-consumer-group");
+
+    // Override individual Kafka settings when needed
+    options.WithConfiguration("auto.offset.reset", "earliest");
 
     options.RegisterMessageHandler<OrderPlaced, OrderPlacedHandler>("order-events", "order-placed");
 });
@@ -133,6 +157,17 @@ public class OrderPlacedHandler : IMessageHandler<OrderPlaced>
             "Handling OrderPlaced event. OrderId: {OrderId}", message.OrderId);
 
         await _repository.SaveAsync(message.OrderId);
+    }
+}
+```
+
+**Message envelope** – Dafda wraps every message in a JSON envelope:
+```json
+{
+    "messageId": "100bee5a-82af-4003-82a2-fa6e543de24f",
+    "type": "order-placed",
+    "data": {
+        "orderId": "538b7db6-54c0-4115-ab6d-583d9714a289"
     }
 }
 ```
