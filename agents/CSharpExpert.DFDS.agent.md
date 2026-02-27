@@ -92,17 +92,17 @@ services.AddHttpClient<IExternalService, ExternalService>()
     .AddCircuitBreakerPolicy(4, TimeSpan.FromSeconds(30));
 ```
 
-### Testing with xUnit and Moq
+### Testing with NUnit and Moq
 
 **Write comprehensive tests:**
-- Use xUnit as the test framework
+- Use NUnit as the test framework
 - Mock dependencies with Moq or NSubstitute
 - Use FluentAssertions for expressive assertions
 - Create test fixtures and builders for test data
 
 **Example:**
 ```csharp
-[Fact]
+[Test]
 public async Task CreateOrder_WithValidInput_ReturnsCreatedOrder()
 {
     // Arrange
