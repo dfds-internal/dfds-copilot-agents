@@ -28,25 +28,30 @@ Every piece of code you generate must be production-ready from the start. This m
 
 ## Structured Logging and Observability
 
+Observability is **mandatory** and part of production readiness. All services must export logs, metrics, and traces using **OpenTelemetry (OTLP)**. Logs are centrally collected via an OTLP Collector and visualized in **Grafana**.
+
 **Every system must be observable. Always:**
 - Use structured logging, not string concatenation or interpolation
-- Include correlation IDs in all log entries for distributed tracing
+- Include `correlationId` in every log entry, span, and metric for distributed tracing
 - Log at appropriate levels (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 - Log key business events and technical events (request started, completed, failed)
 - Never log sensitive data (credentials, PII, tokens)
 - Implement health check endpoints (`/health`, `/ready`)
 - Add custom metrics for business and technical indicators
-- Use OpenTelemetry or compatible APM tools (Application Insights, Grafana Cloud, CloudWatch)
-- Include contextual information: request IDs, user IDs, operation names, durations
+- Use the **OpenTelemetry SDK** with the **OTLP exporter** for all telemetry (logs, metrics, traces)
+- Export all telemetry to a central **OTLP Collector** and visualize in **Grafana**
+- **Do not use direct vendor-specific logging or APM SDKs** (e.g., Application Insights SDK, AWS CloudWatch Logs SDK, Datadog Agent) unless explicitly approved — use OpenTelemetry instead
+- Include contextual information in every log entry: `correlationId`, user IDs, operation names, durations
 - Log all successful and unsuccessful authentication attempts (logins, failed logins, password resets)
 - Log all successful and unsuccessful authorization attempts (resource access, action attempts, data changes)
 - Log all changes to user accounts and permissions (create, modify, delete accounts, role/permission changes)
 - Log all suspicious activity (multiple failed attempts, unusual access patterns, unauthorized configuration changes)
 
 **What this looks like in practice:**
-- Every service logs structured JSON with consistent field names
-- Each request has a unique correlation ID that flows through all systems
+- Every service logs structured JSON with consistent field names, always including `correlationId`
+- Each request has a unique correlation ID that flows through all systems via OpenTelemetry context propagation
 - You can trace a user's journey across services using correlation IDs
+- All telemetry (logs, metrics, traces) flows through the OTLP Collector to Grafana dashboards
 - Health checks report dependency status, not just "healthy"
 - Dashboards show both technical metrics (latency, errors) and business metrics (orders, users)
 
