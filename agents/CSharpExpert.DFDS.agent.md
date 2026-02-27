@@ -61,64 +61,19 @@ public class CreateOrderRequest
 }
 ```
 
-### Structured Logging with ILogger and OpenTelemetry
+### Structured Logging with ILogger
 
-**Use ASP.NET Core's logging abstractions wired to OpenTelemetry:**
+**Use ASP.NET Core's logging abstractions:**
 - Inject `ILogger<T>` for structured, typed logging
-- Use log message templates with named parameters (never string interpolation)
-- Always include `correlationId` in log entries via OpenTelemetry context propagation or middleware
-- Export all telemetry (logs, metrics, traces) via the **OpenTelemetry SDK** with the **OTLP exporter** to a central OTLP Collector
-- **Do not** add vendor-specific SDKs (e.g., `Microsoft.ApplicationInsights`) — use OpenTelemetry instead
+- Use log message templates with named parameters
+- Include correlation IDs using middleware or activity tracking
 
-**NuGet packages:**
-```bash
-dotnet add package OpenTelemetry.Extensions.Hosting
-dotnet add package OpenTelemetry.Instrumentation.AspNetCore
-dotnet add package OpenTelemetry.Instrumentation.Http
-dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol
-```
-
-**Setup in Program.cs:**
-```csharp
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddOtlpExporter())
-    .WithMetrics(metrics => metrics
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddOtlpExporter())
-    .WithLogging(logging => logging
-        .AddOtlpExporter());
-
-// OTLP endpoint is read from OTEL_EXPORTER_OTLP_ENDPOINT environment variable
-```
-
-**Logging with correlation ID (automatic via OpenTelemetry context):**
+**Example:**
 ```csharp
 _logger.LogInformation(
     "Order created successfully. OrderId: {OrderId}, CustomerId: {CustomerId}, Amount: {Amount}",
     order.Id, order.CustomerId, order.Amount
 );
-// TraceId / SpanId from the active Activity are automatically attached by OpenTelemetry
-```
-
-**Adding correlationId explicitly via middleware (when not using W3C trace context):**
-```csharp
-app.Use(async (context, next) =>
-{
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-    var correlationId = context.Request.Headers["X-Correlation-ID"].FirstOrDefault()
-        ?? Activity.Current?.TraceId.ToString()
-        ?? Guid.NewGuid().ToString();
-
-    using (logger.BeginScope(new Dictionary<string, object> { ["correlationId"] = correlationId }))
-    {
-        context.Response.Headers["X-Correlation-ID"] = correlationId;
-        await next();
-    }
-});
 ```
 
 ### Cloud Resilience with Polly
@@ -375,7 +330,7 @@ public class OrdersController : ControllerBase
 Every piece of C# code you generate must be:
 - **Maintainable**: Clear, documented, follows SOLID principles
 - **Testable**: Loosely coupled, dependency-injected
-- **Observable**: Logged, traced, and monitored via OpenTelemetry SDK with OTLP export to Grafana
+- **Observable**: Logged, traced, monitored with Application Insights
 - **Resilient**: Handles failures gracefully with Polly
 - **Secure**: Validates input, protects sensitive data
 - **Performant**: Scales horizontally, efficient resource usage

@@ -260,48 +260,19 @@ export function proxy(request: NextRequest) {
 
 **Performance**: `next/image` for all images. `next/font` for fonts. Dynamic imports for heavy components. Track LCP, CLS, INP.
 
-**Logging & observability**: Use OpenTelemetry SDK with OTLP exporter for all telemetry (logs, traces, metrics). Structured logs must always include `correlationId`. Do not use vendor-specific SDKs (e.g., Application Insights, Datadog) unless explicitly approved.
+**Logging & observability**: Use structured logging with correlation IDs. Implement error boundaries for graceful error handling. Monitor Web Vitals (LCP, CLS, INP). Log API errors with context.
 
-**Next.js OpenTelemetry setup** (via `instrumentation.ts`):
 ```typescript
-// instrumentation.ts  (Next.js experimental instrumentation hook)
-export async function register() {
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
-    const { NodeSDK } = await import('@opentelemetry/sdk-node');
-    const { OTLPTraceExporter } = await import('@opentelemetry/exporter-trace-otlp-http');
-    const { OTLPLogExporter } = await import('@opentelemetry/exporter-logs-otlp-http');
-    const { SimpleLogRecordProcessor } = await import('@opentelemetry/sdk-logs');
-    const { getNodeAutoInstrumentations } = await import('@opentelemetry/auto-instrumentations-node');
-
-    const sdk = new NodeSDK({
-      // OTLP endpoint is read from OTEL_EXPORTER_OTLP_ENDPOINT env var
-      traceExporter: new OTLPTraceExporter(),
-      logRecordProcessor: new SimpleLogRecordProcessor(new OTLPLogExporter()),
-      instrumentations: [getNodeAutoInstrumentations()],
-    });
-    sdk.start();
-  }
-}
-```
-
-**Structured logging with correlationId:**
-```typescript
-import { trace } from '@opentelemetry/api';
 import { logger } from '@/lib/logger';
-
-function getCorrelationId(): string {
-  const span = trace.getActiveSpan();
-  return span?.spanContext().traceId ?? crypto.randomUUID();
-}
 
 export async function fetchUser(userId: string) {
   try {
-    logger.info('Fetching user', { userId, correlationId: getCorrelationId() });
+    logger.info('Fetching user', { userId });
     const user = await api.get(`/users/${userId}`);
-    logger.info('User fetched successfully', { userId, correlationId: getCorrelationId() });
+    logger.info('User fetched successfully', { userId });
     return user;
   } catch (error) {
-    logger.error('Failed to fetch user', { userId, error: error.message, correlationId: getCorrelationId() });
+    logger.error('Failed to fetch user', { userId, error: error.message });
     throw error;
   }
 }
