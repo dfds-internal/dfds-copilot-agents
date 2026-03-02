@@ -56,8 +56,8 @@ OUTPUT
 
 The checklist must include exactly these items:
 
-- [ ] ECR repository requested/created (DFDS wiki: request_a_new_ecr_repository) and ECR URI split correctly into ECR_REGISTRY + ECR_REPOSITORY
-- [ ] AWS ECR push credentials obtained (DFDS wiki: obtain-aws-ecr-push-credentials)
+- [ ] ECR repository requested/created (DFDS wiki: https://wiki.dfds.cloud/en/playbooks/supporting-services/ecr/request_a_new_ecr_repository)
+- [ ] AWS ECR push credentials obtained (DFDS wiki: https://wiki.dfds.cloud/en/playbooks/supporting-services/ecr/obtain-aws-ecr-push-credentials)
 - [ ] GitHub Secrets created and names match:
       AWS_ACCESS_KEY_ID_SECRET_NAME and AWS_SECRET_ACCESS_KEY_SECRET_NAME
 - [ ] AWS_REGION matches the ECR registry region
