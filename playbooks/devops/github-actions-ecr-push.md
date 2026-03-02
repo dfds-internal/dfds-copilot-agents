@@ -8,12 +8,12 @@ Goal:
 
 TOP-LEVEL ENV (must be defined once at the top):
 - AWS_REGION=ChangeThisToYourAwsRegion (default eu-central-1)
-- DOCKERFILE_PATH=./Dockerfile
-- BUILD_CONTEXT=.
-- ECR_REGISTRY=579478677147.dkr.ecr.eu-central-1.amazonaws.com
-- ECR_REPOSITORY=hackathon/test-ecr
-- AWS_ACCESS_KEY_ID_SECRET_NAME=ECRPUSHACCESSKEY
-- AWS_SECRET_ACCESS_KEY_SECRET_NAME=ECRPUSHSECRETKEY
+- DOCKERFILE_PATH=./ChangeThisToYourDockerfilePath
+- BUILD_CONTEXT=./ChangeThisToYourBuildContext
+- ECR_REGISTRY=ChangeThisToYourEcrRegistry
+- ECR_REPOSITORY=ChangeThisToYourEcrRepository
+- AWS_ACCESS_KEY_ID_SECRET_NAME=ChangeThisToYourAccessKeySecretName
+- AWS_SECRET_ACCESS_KEY_SECRET_NAME=ChangeThisToYourSecretKeySecretName
 
 TRIGGERS
 - push to main
