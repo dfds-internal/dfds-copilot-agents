@@ -2,6 +2,20 @@
 
 Standardized GitHub Copilot Agent definitions and prompt patterns for DFDS engineering teams. This repository provides production-ready agent configurations designed to accelerate development while maintaining our engineering excellence standards.
 
+## Agents vs Playbooks
+
+This repository contains two complementary types of resources:
+
+| | Agents | Playbooks |
+|---|---|---|
+| **What** | Persona-based Copilot configurations | Reusable operational templates |
+| **Examples** | C#, Next.js, Python experts | CI/CD pipelines, infra, deployment prompts |
+| **Where** | `/agents` → copy to `.github/agents/` | `/playbooks` → use as prompt or workflow template |
+| **Purpose** | Shape *how* Copilot thinks and responds | Provide ready-made *outputs* to copy and adapt |
+
+- **Agents** give GitHub Copilot a role, standards, and constraints so it generates code aligned with DFDS engineering practices.
+- **Playbooks** are ready-to-use operational templates (e.g. GitHub Actions workflows) that you copy into your project and customise.
+
 ## Purpose
 
 This repository is an **internal engineering enablement library** that standardizes how DFDS teams leverage GitHub Copilot Agents across different technology stacks. It's not an application—it's a collection of best-practice agent definitions and usage patterns that help teams:
@@ -117,6 +131,23 @@ Skills are domain-specific knowledge files that agents load on demand. They cove
 
 Both the Next.js and TanStack Start agents reference these skills directly.
 
+## Playbooks
+
+Playbooks are reusable operational templates that you copy into your project and customise. Unlike agents (which shape Copilot's behaviour), playbooks are concrete, ready-to-use outputs.
+
+### DevOps
+
+| Playbook | Purpose |
+|----------|---------|
+| [github-actions-ecr-push.md](./playbooks/devops/github-actions-ecr-push.md) | GitHub Actions workflow — build & push Docker image to AWS ECR |
+
+### How to use a playbook
+
+1. Open the relevant playbook file.
+2. Copy the workflow / template it contains into your project.
+3. Replace the placeholder values (clearly marked as `ChangeThisTo…`) with your actual configuration.
+4. Follow the **Setup Instructions** section in the playbook for any additional steps (e.g. adding GitHub Secrets).
+
 ## Examples
 
 Check the [/examples](./examples) folder for practical demonstrations of how to use each agent effectively:
@@ -139,6 +170,17 @@ We welcome contributions from all DFDS engineering teams! Here's how you can hel
    - Testing expectations
    - Technology-specific best practices
 4. **Add usage examples** in the `/examples` folder
+5. **Submit a Pull Request** with a clear description
+
+### Adding New Playbooks
+
+1. **Fork this repository** and create a feature branch
+2. **Create a new playbook** under `/playbooks/<category>/` (e.g. `/playbooks/devops/`) as a Markdown file
+3. **Ensure your playbook includes**:
+   - A ready-to-use template (workflow YAML, script, etc.) with clearly marked placeholder values
+   - A **Setup Instructions** section explaining how to adapt and use it
+   - A **Notes** section covering key design decisions and security considerations
+4. **Register it** in the Playbooks table in `README.md`
 5. **Submit a Pull Request** with a clear description
 
 ### Improving Existing Agents
