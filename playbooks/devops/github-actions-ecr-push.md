@@ -1,55 +1,72 @@
-Create a production-ready GitHub Actions workflow that builds and pushes a Docker image to AWS ECR.
+Create a reusable (dynamic) GitHub Actions workflow that builds and pushes a Docker image to AWS ECR.
 
-The workflow must:
+Goal:
+- Works across many repositories.
+- Users must only modify values in the env block at the top.
+- No hardcoded credentials.
+- Clean, minimal, enterprise-ready.
 
-GENERAL
-- Be clean, minimal, and enterprise-ready.
-- Not hardcode any credentials or environment-specific values.
-- Use environment variables at the top of the file for easy modification.
+TOP-LEVEL ENV (must be defined once at the top):
+- AWS_REGION=ChangeThisToYourAwsRegion (default eu-central-1)
+- DOCKERFILE_PATH=./Dockerfile
+- BUILD_CONTEXT=.
+- ECR_REGISTRY=579478677147.dkr.ecr.eu-central-1.amazonaws.com
+- ECR_REPOSITORY=hackathon/test-ecr
+- AWS_ACCESS_KEY_ID_SECRET_NAME=ECRPUSHACCESSKEY
+- AWS_SECRET_ACCESS_KEY_SECRET_NAME=ECRPUSHSECRETKEY
 
-ENV VARIABLES (must be defined at top of workflow):
-- AWS_REGION=eu-central-1
-- DOCKERFILE_PATH=./ChangeThisToYourDockerfilePath
-- BUILD_CONTEXT=./ChangeThisToYourBuildContext
-- ECR_REGISTRY=ChangeThisToYourEcrRegistry
-- ECR_REPOSITORY=ChangeThisToYourEcrRepository
-
-TRIGGER
-- Run only on push to main branch.
-- Optionally allow commented examples for:
+TRIGGERS
+- push to main
+- include commented examples for:
   - feature/*
   - release/*
 
 AUTHENTICATION
-- Use GitHub Secrets (do not hardcode):
-  - ChangeThisToYOURECRACCESSKEY
-  - ChangeThisToYOURECRSECRETKEY
-- Configure AWS credentials using aws-actions/configure-aws-credentials.
+- Use aws-actions/configure-aws-credentials@v4
+- Use dynamic secret lookup exactly like this:
+  aws-access-key-id: ${{ secrets[env.AWS_ACCESS_KEY_ID_SECRET_NAME] }}
+  aws-secret-access-key: ${{ secrets[env.AWS_SECRET_ACCESS_KEY_SECRET_NAME] }}
+  aws-region: ${{ env.AWS_REGION }}
 
-ACTIONS TO USE
-- actions/checkout
-- aws-actions/configure-aws-credentials
-- aws-actions/amazon-ecr-login
-- docker/build-push-action
+ACTIONS
+- actions/checkout@v4
+- aws-actions/configure-aws-credentials@v4
+- aws-actions/amazon-ecr-login@v2
+- docker/build-push-action@v5
 
-BUILD & PUSH REQUIREMENTS
-- Build using:
-  - context: ${{ env.BUILD_CONTEXT }}
-  - file: ${{ env.DOCKERFILE_PATH }}
-- Push image to:
+TAGGING
+- latest
+- sha-<shortSha> (first 7 characters of GITHUB_SHA)
+- Derive shortSha using a separate step and GITHUB_OUTPUT.
+
+BUILD & PUSH
+- context: ${{ env.BUILD_CONTEXT }}
+- file: ${{ env.DOCKERFILE_PATH }}
+- push to:
   ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
-- Tag image with:
-  - latest
-  - sha-<shortSha>
-- Derive shortSha from the first 7 characters of GITHUB_SHA inside the workflow.
 - Fail fast on errors.
 
 OUTPUT
-- Generate the full YAML file for:
-  .github/workflows/push-to-ecr.yml
+1) Full YAML for:
+   .github/workflows/push-to-ecr.yml
 
-Also include a short README snippet explaining:
-- Which environment variables must be replaced.
-- Which GitHub Secrets must be configured.
-- That AWS credentials must have ECR push permissions.
-- Do not include external URLs inside the workflow YAML.
+2) After the YAML, output ONLY a short markdown section titled:
+
+## Validation Checklist
+
+The checklist must include exactly these items:
+
+- [ ] ECR repository requested/created (DFDS wiki: request_a_new_ecr_repository) and ECR URI split correctly into ECR_REGISTRY + ECR_REPOSITORY
+- [ ] AWS ECR push credentials obtained (DFDS wiki: obtain-aws-ecr-push-credentials)
+- [ ] GitHub Secrets created and names match:
+      AWS_ACCESS_KEY_ID_SECRET_NAME and AWS_SECRET_ACCESS_KEY_SECRET_NAME
+- [ ] AWS_REGION matches the ECR registry region
+- [ ] DOCKERFILE_PATH points to the correct Dockerfile
+- [ ] BUILD_CONTEXT points to the correct build context
+- [ ] Push to main branch triggered successfully
+- [ ] Confirm image tags exist in ECR: latest and sha-<shortSha>
+
+IMPORTANT:
+- Do NOT include any README section.
+- Do NOT include any external URLs inside the workflow YAML.
+- Only output YAML + the final Validation Checklist section.
