@@ -102,6 +102,44 @@ All agent definitions in this repository are built around DFDS engineering princ
 - Leverage framework capabilities fully
 - Keep dependencies up-to-date and minimal
 
+## Security — CodeQL Analysis
+
+This repository uses [GitHub CodeQL](https://codeql.github.com/) for automated security analysis. CodeQL is GitHub's static-analysis engine that treats code as data: it compiles the source into a queryable database and then runs hundreds of security and quality queries against it to surface vulnerabilities before they reach production.
+
+### What CodeQL does
+
+- Detects common vulnerability classes such as SQL injection, cross-site scripting (XSS), path traversal, insecure deserialization, and more (aligned with OWASP Top 10).
+- Runs data-flow and taint-tracking analyses that follow untrusted input all the way to a dangerous sink — catching issues that simpler pattern-matching tools miss.
+- Reports findings directly in the repository's **Security → Code scanning alerts** tab, and as annotations on Pull Requests.
+
+### How we use it
+
+The workflow is defined in [`.github/workflows/security-codeql.yml`](.github/workflows/security-codeql.yml) and runs:
+
+| Trigger | When |
+|---------|------|
+| **Push** | On every push to `main` / `master` |
+| **Pull Request** | On every PR targeting `main` / `master` |
+| **Schedule** | Every Monday at 03:00 UTC |
+
+Analyzed languages:
+
+| Language | Build mode |
+|----------|-----------|
+| C# | `autobuild` |
+| JavaScript / TypeScript | `none` (no build required) |
+| Python | `none` (no build required) |
+| Java / Kotlin | `autobuild` |
+| Go | `autobuild` |
+| Ruby | `none` (no build required) |
+
+### Acting on alerts
+
+1. Open **Security → Code scanning alerts** in the repository.
+2. Review the alert details, including the data-flow path CodeQL traced.
+3. Fix the vulnerability in your code (or dismiss it with a justification if it is a false positive).
+4. The alert will automatically close once a fixed commit is pushed and the analysis re-runs.
+
 ## Available Agents
 
 ### Base Agent
