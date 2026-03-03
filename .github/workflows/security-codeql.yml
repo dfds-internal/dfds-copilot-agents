@@ -1,0 +1,78 @@
+name: "CodeQL Security Analysis"
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+  schedule:
+    # Runs at 03:00 UTC every Monday
+    - cron: "0 3 * * 1"
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: csharp
+            build-mode: autobuild
+          - language: javascript-typescript
+            build-mode: none
+          - language: python
+            build-mode: none
+          - language: java-kotlin
+            build-mode: autobuild
+          - language: go
+            build-mode: autobuild
+          - language: ruby
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for language files
+        id: check_files
+        shell: bash
+        run: |
+          case "${{ matrix.language }}" in
+            csharp)                EXT="\.(cs|csproj)$" ;;
+            javascript-typescript) EXT="\.(js|ts|jsx|tsx|mjs|cjs)$" ;;
+            python)                EXT="\.py$" ;;
+            java-kotlin)           EXT="\.(java|kt)$" ;;
+            go)                    EXT="\.go$" ;;
+            ruby)                  EXT="\.rb$" ;;
+            *)                     EXT="" ;;
+          esac
+          if [ -n "$EXT" ] && find . -not -path './.git/*' -regextype posix-extended -regex ".*$EXT" -print -quit | grep -q .; then
+            echo "files_found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "files_found=false" >> "$GITHUB_OUTPUT"
+            echo "No ${{ matrix.language }} source files found — skipping analysis."
+          fi
+
+      - name: Initialize CodeQL
+        if: steps.check_files.outputs.files_found == 'true'
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Autobuild
+        if: steps.check_files.outputs.files_found == 'true' && matrix.build-mode == 'autobuild'
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        if: steps.check_files.outputs.files_found == 'true'
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
