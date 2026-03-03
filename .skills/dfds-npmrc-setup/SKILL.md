@@ -48,12 +48,12 @@ pnpm install   # no 401/403 = success
 
 ---
 
-## GitHub Actions — `NPMRC` secret
+## GitHub Actions — `GITHUBTOKEN` secret
 
 Docker/CI builds need the same credentials. Set once per repo:
 
 ```bash
-gh secret set NPMRC \
+gh secret set GITHUBTOKEN \
   --repo <org>/<repo> \
   --body "$(printf '@dfds-frontend:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT_HERE\nalways-auth=true\n')"
 ```
@@ -61,7 +61,7 @@ gh secret set NPMRC \
 Use in workflow (`docker/build-push-action`):
 ```yaml
 secrets: |
-  npmrc=${{ secrets.NPMRC }}
+  npmrc=${{ secrets.GITHUBTOKEN }}
 ```
 
 In `Dockerfile` — mounts secret at build time, **never baked into the image**:
@@ -78,7 +78,7 @@ RUN --mount=type=secret,id=npmrc,dst=/root/.npmrc \
 |---|---|
 | `401 Unauthorized` on `pnpm install` | Wrong or missing token in `.npmrc` |
 | `403 Forbidden` | Token missing `read:packages` scope |
-| Docker `npm ERR! code E401` | `NPMRC` secret missing or expired |
+| Docker `npm ERR! code E401` | `GITHUBTOKEN` secret missing or expired |
 | 1Password token expired | Org admin must rotate + update the note |
 
 ---
@@ -99,7 +99,7 @@ Created by    : <github-username>
 always-auth=true
 
 ─── gh secret set command (once per repo) ───────────────────────
-gh secret set NPMRC --repo <org>/<repo> \
+gh secret set GITHUBTOKEN --repo <org>/<repo> \
   --body "$(printf '@dfds-frontend:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nalways-auth=true\n')"
 
 ─── Rotation checklist ──────────────────────────────────────────
