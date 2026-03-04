@@ -76,3 +76,6 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
+          # Skip SARIF upload for PRs from forks — those runs lack permission to
+          # write to the Code Scanning API.  Results are still produced locally.
+          upload: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
