@@ -112,6 +112,17 @@ This repository uses [GitHub CodeQL](https://codeql.github.com/) for automated s
 - Runs data-flow and taint-tracking analyses that follow untrusted input all the way to a dangerous sink — catching issues that simpler pattern-matching tools miss.
 - Reports findings directly in the repository's **Security → Code scanning alerts** tab, and as annotations on Pull Requests.
 
+### Prerequisites — enabling Code Scanning
+
+Before the CodeQL workflow can upload results, **Code Scanning must be enabled** in the repository settings:
+
+1. Go to **Settings → Security → Code security and analysis**.
+2. Under **Code scanning**, click **Set up** (or **Enable**).
+3. Choose **Set up with a workflow** if you are bringing your own workflow file (as this repository does).
+
+> **Note**: Only repository admins can enable Code Scanning. Without this step the `analyze` step will fail with:
+> *"Code scanning is not enabled for this repository. Please enable code scanning in the repository settings."*
+
 ### How we use it
 
 The workflow is defined in [`.github/workflows/security-codeql.yml`](.github/workflows/security-codeql.yml) and runs:
@@ -139,6 +150,14 @@ Analyzed languages:
 2. Review the alert details, including the data-flow path CodeQL traced.
 3. Fix the vulnerability in your code (or dismiss it with a justification if it is a false positive).
 4. The alert will automatically close once a fixed commit is pushed and the analysis re-runs.
+
+### Troubleshooting
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| *"Code scanning is not enabled for this repository"* | Code Scanning is disabled in repo settings | Enable it under **Settings → Security → Code security and analysis** (admin required) |
+| *"This run of the CodeQL Action does not have permission to access the CodeQL Action API endpoints"* | Workflow running on a PR from a **fork** — fork PRs cannot write to the Code Scanning API | Expected behaviour; the workflow skips SARIF upload automatically for fork PRs. Results are still analysed locally. Merge the PR and the next push/schedule run will upload results. |
+| *"Please ensure the workflow has at least the 'security-events: read' permission"* | Missing permission in the workflow | The workflow already declares `security-events: write`. If you see this on a non-fork PR, confirm Code Scanning is enabled in repository settings. |
 
 ## Available Agents
 
