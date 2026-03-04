@@ -1,4 +1,4 @@
-name: security-gitleaks
+name: Security Secret Scanning (Gitleaks)
 
 on:
   pull_request:
