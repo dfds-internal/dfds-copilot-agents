@@ -77,6 +77,40 @@ Once configured, you can invoke the agent in:
 
 For detailed instructions, see [Agents.md](./Agents.md).
 
+## Using with Visual Studio
+
+GitHub Copilot in **Visual Studio** does not yet automatically discover agent definitions placed under `.github/agents`. To get equivalent Copilot guidance in Visual Studio, create a `copilot-instructions.md` file in the **root of your repository**. Copilot Chat in Visual Studio reads this file as its primary instruction source, applying its contents to every conversation in that workspace.
+
+### How to set it up
+
+1. Create `copilot-instructions.md` in your repository root.
+2. Paste in the contents of the DFDS base agent and any relevant language-specific agents, or reference them by inclusion.
+3. Commit the file — Copilot Chat will pick it up automatically.
+
+### Example `copilot-instructions.md`
+
+```markdown
+# Copilot Instructions
+
+This project follows DFDS engineering standards. Apply the guidelines below to all code suggestions.
+
+## DFDS Base Standards
+
+- Prioritize security by default: validate all inputs, manage secrets via environment variables, and follow the principle of least privilege.
+- Write production-ready code: include structured logging with correlation IDs, health checks, and graceful error handling.
+- Tests are non-negotiable: provide unit tests for all business logic and integration tests for critical paths.
+- Follow cloud-native best practices: design for horizontal scalability, externalize configuration, and handle transient failures with retry/backoff.
+
+## Language-Specific Standards
+
+<!-- Add the relevant section(s) from the DFDS language-specific agents below, for example: -->
+<!-- - CSharpExpert.DFDS.agent.md for C#/.NET projects -->
+<!-- - NextJsExpert.DFDS.agent.md for Next.js/React projects -->
+<!-- - PythonExpert.DFDS.agent.md for Python projects -->
+```
+
+Copy the relevant sections from the agent files in this repository's `/agents` folder directly into your `copilot-instructions.md`. This gives Visual Studio Copilot the same context that VS Code users get through the `.github/agents` discovery mechanism.
+
 ## Engineering Principles
 
 All agent definitions in this repository are built around DFDS engineering principles:
