@@ -1,0 +1,26 @@
+name: "Security Dependency Scan (Snyk)"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  snyk:
+    name: Scan dependencies with Snyk
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Snyk
+        uses: snyk/actions/setup@v1
+
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk dependency scan
+        run: snyk test

@@ -196,6 +196,44 @@ cp path/to/dfds-copilot-agents/.github/workflows/security-gitleaks.yml .github/w
 
 No additional secrets or permissions are required beyond the default `GITHUB_TOKEN`.
 
+## Security — Snyk Dependency Scanning
+
+This repository uses [Snyk](https://snyk.io/) to automatically scan dependencies for known vulnerabilities, keeping the supply chain secure.
+
+### What Snyk does
+
+- Checks all project dependencies against Snyk's continuously updated vulnerability database.
+- Reports vulnerabilities directly in **PR Checks** and **Actions logs**, blocking merges when issues are found.
+- Covers a wide range of ecosystems (npm, pip, NuGet, Maven, Go modules, and more).
+
+### Prerequisites — required secret
+
+Before the Snyk workflow can run, add a repository secret named **`SNYK_TOKEN`**:
+
+1. Sign in to [app.snyk.io](https://app.snyk.io) (or create a free account).
+2. Go to **Account Settings → API Token** and copy your token.
+3. In this repository, go to **Settings → Secrets and variables → Actions → New repository secret**.
+4. Name it `SNYK_TOKEN` and paste the token value.
+
+> **Note**: Without this secret the workflow will fail at the authentication step.
+
+### How we use it
+
+The workflow is defined in [`.github/workflows/security-snyk.yml`](.github/workflows/security-snyk.yml) and runs:
+
+| Trigger | When |
+|---------|------|
+| **Push** | On every push to `main` |
+| **Pull Request** | On every PR (all branches) |
+
+### What to do when Snyk finds a vulnerability
+
+1. **Review the output** in the Actions log or PR Checks tab to see which package and CVE is affected.
+2. **Upgrade the dependency** to a version that contains the fix (Snyk usually suggests the minimum safe version).
+3. **Apply an official patch** if an upgrade is not yet available and Snyk provides one.
+4. **Rotate leaked credentials** if the vulnerability involves a secret or token exposure.
+5. Re-run the workflow to confirm the scan passes after your fix.
+
 ## Available Agents
 
 ### Base Agent
