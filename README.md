@@ -159,6 +159,43 @@ Analyzed languages:
 | *"This run of the CodeQL Action does not have permission to access the CodeQL Action API endpoints"* | Workflow running on a PR from a **fork** — fork PRs cannot write to the Code Scanning API | Expected behaviour; the workflow skips SARIF upload automatically for fork PRs. Results are still analysed locally. Merge the PR and the next push/schedule run will upload results. |
 | *"Please ensure the workflow has at least the 'security-events: read' permission"* | Missing permission in the workflow | The workflow already declares `security-events: write`. If you see this on a non-fork PR, confirm Code Scanning is enabled in repository settings. |
 
+## Security — Gitleaks Secret Scanning
+
+This repository uses [Gitleaks](https://github.com/gitleaks/gitleaks) to automatically detect accidentally committed secrets (API keys, tokens, passwords, and other credentials) before they can reach production.
+
+### What Gitleaks does
+
+- Scans the **full Git history** (`fetch-depth: 0`) on every run, so secrets introduced in any commit are caught — not just the latest diff.
+- Detects a broad set of credential patterns out of the box (AWS keys, GitHub tokens, private keys, generic high-entropy strings, and many more).
+- Fails the workflow and surfaces a clear error message when a leak is found, blocking the PR or push until the secret is removed or addressed.
+
+### How we use it
+
+The workflow is defined in [`.github/workflows/security-gitleaks.yml`](.github/workflows/security-gitleaks.yml) and runs:
+
+| Trigger | When |
+|---------|------|
+| **Push** | On every push to `main` |
+| **Pull Request** | On every PR (all branches) |
+
+### What to do when Gitleaks flags a secret
+
+1. **Do not simply delete the file or overwrite the value** — the secret is still in Git history.
+2. **Rotate the secret immediately** with the issuing service (GitHub, AWS, etc.).
+3. **Remove it from history** using `git filter-repo` or BFG Repo Cleaner, then force-push (coordinate with your team).
+4. **Re-run the workflow** to confirm the scan passes.
+5. If the finding is a **false positive**, add an exception to a `.gitleaks.toml` config file in the repository root (see the [Gitleaks docs](https://github.com/gitleaks/gitleaks#configuration) for details).
+
+### Using Gitleaks in your own project
+
+Copy the workflow into your project's `.github/workflows/` folder:
+
+```bash
+cp path/to/dfds-copilot-agents/.github/workflows/security-gitleaks.yml .github/workflows/
+```
+
+No additional secrets or permissions are required beyond the default `GITHUB_TOKEN`.
+
 ## Available Agents
 
 ### Base Agent
