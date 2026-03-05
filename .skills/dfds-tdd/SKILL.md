@@ -1,9 +1,13 @@
 ---
-name: tdd
+name: dfds-tdd
 description: Test-Driven Development workflow. Use this skill for ALL implementation tasks — features, bug fixes, new domain models, new endpoints, new UI components. TDD is the default development approach.
 argument-hint: <description of what to implement>
+metadata:
+  author: dfds
+  version: 1.0.0
 ---
 
+# Test-Driven Development (TDD)
 Implement `$ARGUMENTS` using strict RED-GREEN-REFACTOR TDD.
 
 No production code without a failing test first.

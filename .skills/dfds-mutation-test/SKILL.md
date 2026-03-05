@@ -1,11 +1,11 @@
 ---
-name: mutation-test
+name: dfds-mutation-test
 description: Run AI-powered mutation testing on source code to find gaps in test coverage. Use when verifying test quality, checking if tests catch real bugs, or improving test suites.
 ---
 
 Apply semantically meaningful mutations that represent realistic developer bugs — not random syntactic changes.
 
-**Usage**: `/mutation-test <file-or-directory>` or `/mutation-test --branch`
+**Usage**: `/dfds-mutation-test <file-or-directory>` or `/dfds-mutation-test --branch`
 
 ## Steps
 
@@ -69,7 +69,7 @@ For each planned mutation:
 **Rules:**
 - ONE mutation at a time. Never stack.
 - ALWAYS revert before the next mutation. If revert fails, stop and alert the user.
-- Never modify test files.
+- Never modify test files while executing mutations — only analyze them and report suggested improvements (do not auto-edit test files).
 - Mutations must be syntactically valid — no compile errors.
 - Show a running tally: `[3/10] Killed | removed nil check in ValidateOrder`
 
