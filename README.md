@@ -294,6 +294,8 @@ Skills are domain-specific knowledge files that agents load on demand. They cove
 | [dfds-navigator-ui](./skills/dfds-navigator-ui/SKILL.md) | Add the DFDS header, Navigator tokens, and shadcn/ui with DFDS colours to any React project |
 | [dfds-shadcn-theme](./skills/dfds-shadcn-theme/SKILL.md) | Complete shadcn/ui DFDS theme — CSS variables, Tailwind v4 `@theme inline` bridge, and CVI form overrides |
 | [dfds-npmrc-setup](./skills/dfds-npmrc-setup/SKILL.md) | Authenticate with the `@dfds-frontend` GitHub Packages registry (local, Docker, CI) |
+| [dfds-tdd](./.skills/dfds-tdd/SKILL.md) | Test-Driven Development workflow — strict RED-GREEN-REFACTOR cycles for features, bug fixes, and new components |
+| [dfds-mutation-test](./.skills/dfds-mutation-test/SKILL.md) | AI-powered mutation testing to find gaps in test coverage and verify test quality |
 
 Both the Next.js and TanStack Start agents reference these skills directly.
 
