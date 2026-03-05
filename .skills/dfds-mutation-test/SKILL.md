@@ -6,6 +6,7 @@ metadata:
   version: 1.0.0
 ---
 
+# mutation-test
 Apply semantically meaningful mutations that represent realistic developer bugs — not random syntactic changes.
 
 **Usage**: `/dfds-mutation-test <file-or-directory>` or `/dfds-mutation-test --branch`
