@@ -1,6 +1,9 @@
 ---
 name: dfds-mutation-test
 description: Run AI-powered mutation testing on source code to find gaps in test coverage. Use when verifying test quality, checking if tests catch real bugs, or improving test suites.
+metadata:
+  author: dfds
+  version: 1.0.0
 ---
 
 Apply semantically meaningful mutations that represent realistic developer bugs — not random syntactic changes.
